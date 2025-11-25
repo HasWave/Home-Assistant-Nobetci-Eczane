@@ -6,7 +6,7 @@
         "description": "İl ve ilçe bazlı nöbetçi eczane bilgilerini almak için gerekli bilgileri girin.",
         "data": {
           "city": "İl",
-          "district": "İlçe (Opsiyonel)",
+          "district": "İlçe",
           "api_url": "API URL",
           "update_interval": "Güncelleme Aralığı (saniye)",
           "limit": "Maksimum Eczane Sayısı",
@@ -14,7 +14,7 @@
         },
         "data_description": {
           "city": "Büyük harf ile il adı (örn: TEKİRDAĞ, İSTANBUL, ANKARA)",
-          "district": "Büyük harf ile ilçe adı (örn: ÇERKEZKÖY, KADIKÖY, ÇANKAYA). Boş bırakılırsa tüm ilçeler için sonuç döner.",
+          "district": "Büyük harf ile ilçe adı (opsiyonel, örn: ÇERKEZKÖY, KADIKÖY, ÇANKAYA). Boş bırakılırsa tüm ilçeler için sonuç döner.",
           "api_url": "API endpoint URL'i (varsayılan: https://api.haswave.com/api/v1/eczane)",
           "update_interval": "Veri güncelleme aralığı saniye cinsinden (varsayılan: 3600 = 1 saat)",
           "limit": "API'den çekilecek maksimum eczane sayısı (0 = tümü, varsayılan: 0)",
@@ -24,6 +24,7 @@
     },
     "error": {
       "cannot_connect": "API'ye bağlanılamadı. Lütfen bilgilerinizi kontrol edin.",
+      "invalid_sensor_count": "Sensor sayısı 1-10 arası olmalıdır.",
       "unknown": "Beklenmeyen bir hata oluştu."
     },
     "abort": {
