@@ -31,7 +31,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     async def async_update_data():
         """Fetch data from API."""
-        return await hass.async_add_executor_job(api.fetch_pharmacies)
+        try:
+            data = await hass.async_add_executor_job(api.fetch_pharmacies)
+            if data:
+                _LOGGER.debug(f"API'den {len(data)} eczane verisi alındı")
+            else:
+                _LOGGER.warning("API'den veri alınamadı")
+            return data
+        except Exception as err:
+            _LOGGER.error(f"Veri güncelleme hatası: {err}")
+            raise
     
     coordinator = DataUpdateCoordinator(
         hass,
@@ -41,11 +50,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         update_interval=timedelta(seconds=update_interval),
     )
     
-    await coordinator.async_config_entry_first_refresh()
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception as err:
+        _LOGGER.error(f"İlk veri yükleme hatası: {err}")
+        # Hata olsa bile devam et, sensor'lar oluşturulsun
     
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "coordinator": coordinator,
         "api": api,
+        "sensor_count": entry.data.get("sensor_count", 5),
     }
     
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
