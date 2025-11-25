@@ -68,16 +68,16 @@
 
 Integration otomatik olarak şu sensor'ları oluşturur:
 
-#### `sensor.haswave_eczane_count`
+#### `sensor.haswave_nobetci_eczane_count`
 Nöbetçi eczane sayısı (statistics için)
 
-#### `sensor.haswave_eczane_1`
+#### `sensor.haswave_nobetci_eczane_1`
 1. eczane adı (attributes içinde telefon, adres, harita linki)
 
-#### `sensor.haswave_eczane_2`
+#### `sensor.haswave_nobetci_eczane_2`
 2. eczane adı (attributes içinde telefon, adres, harita linki)
 
-#### ... (maksimum 10 eczane)
+#### ... (maksimum 5 eczane)
 
 Her eczane sensor'ının attributes'ları:
 - `phone`: Formatlanmış telefon numarası (örn: `0282 717 8529`)
@@ -94,12 +94,12 @@ Lovelace UI'da kart ekleyin:
 type: entities
 title: Nöbetçi Eczaneler
 entities:
-  - entity: sensor.haswave_eczane_count
+  - entity: sensor.haswave_nobetci_eczane_count
     name: Nöbetçi Eczane Sayısı
-    icon: mdi:pharmacy
-  - entity: sensor.haswave_eczane_1
+    icon: mdi:stethoscope
+  - entity: sensor.haswave_nobetci_eczane_1
     name: En Yakın Eczane
-    icon: mdi:pharmacy
+    icon: mdi:stethoscope
 ```
 
 #### Mushroom Template Card Örneği (Önerilen)
@@ -112,27 +112,19 @@ cards:
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-template-card
-        primary: "{{ states('sensor.haswave_eczane_1') }}"
-        secondary: 📞 {{ state_attr('sensor.haswave_eczane_1', 'phone') }}
+        primary: "{{ states('sensor.haswave_nobetci_eczane_1') }}"
+        secondary: |-
+          📞 {{ state_attr('sensor.haswave_nobetci_eczane_1', 'phone') }}
         icon: mdi:stethoscope
         icon_color: red
-        features_position: bottom
-        tap_action:
-          action: call-service
-          service: browser_mod.navigate
-          service_data:
-            path: "{{ state_attr('sensor.haswave_eczane_1', 'map_link') }}"
+        entity: sensor.haswave_nobetci_eczane_1
       - type: custom:mushroom-template-card
-        primary: "{{ states('sensor.haswave_eczane_2') }}"
-        secondary: 📞 {{ state_attr('sensor.haswave_eczane_2', 'phone') }}
+        primary: "{{ states('sensor.haswave_nobetci_eczane_2') }}"
+        secondary: |-
+          📞 {{ state_attr('sensor.haswave_nobetci_eczane_2', 'phone') }}
         icon: mdi:stethoscope
         icon_color: red
-        features_position: bottom
-        tap_action:
-          action: call-service
-          service: browser_mod.navigate
-          service_data:
-            path: "{{ state_attr('sensor.haswave_eczane_2', 'map_link') }}"
+        entity: sensor.haswave_nobetci_eczane_2
 ```
 
 **Not:** Mushroom Cards kullanmak için [Mushroom Cards](https://github.com/piitaya/lovelace-mushroom) eklentisini yüklemeniz gerekir.
@@ -152,9 +144,9 @@ automation:
         data:
           title: "💊 Nöbetçi Eczane"
           message: >
-            {{ states('sensor.haswave_eczane_1') }}
-            📞 {{ state_attr('sensor.haswave_eczane_1', 'phone') }}
-            📍 {{ state_attr('sensor.haswave_eczane_1', 'address') }}
+            {{ states('sensor.haswave_nobetci_eczane_1') }}
+            📞 {{ state_attr('sensor.haswave_nobetci_eczane_1', 'phone') }}
+            📍 {{ state_attr('sensor.haswave_nobetci_eczane_1', 'address') }}
 ```
 
 ## 🔧 Gelişmiş Kullanım
