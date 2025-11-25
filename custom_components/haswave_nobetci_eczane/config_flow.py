@@ -1,7 +1,9 @@
 """Config flow for HasWave Nöbetçi Eczane integration."""
 from __future__ import annotations
 
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 import voluptuous as vol
@@ -10,22 +12,44 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import translation
 
 from .const import DOMAIN, DEFAULT_API_URL, DEFAULT_UPDATE_INTERVAL, DEFAULT_SENSOR_COUNT
 from .api import HasWaveEczaneAPI
 
 _LOGGER = logging.getLogger(__name__)
 
-STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required("city"): str,
-        vol.Optional("district", default=""): str,
-        vol.Optional("api_url", default=DEFAULT_API_URL): str,
-        vol.Optional("update_interval", default=DEFAULT_UPDATE_INTERVAL): int,
-        vol.Optional("limit", default=0): int,
-        vol.Optional("sensor_count", default=DEFAULT_SENSOR_COUNT): vol.Coerce(int),
-    }
-)
+
+def _load_strings() -> dict:
+    """Load strings.json file."""
+    strings_path = Path(__file__).parent / "strings.json"
+    try:
+        with open(strings_path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        _LOGGER.warning(f"Strings dosyası yüklenemedi: {e}")
+        return {}
+
+def _get_schema(strings: dict | None = None) -> vol.Schema:
+    """Get schema with localized strings."""
+    if strings is None:
+        strings = _load_strings()
+    
+    step_strings = strings.get("config", {}).get("step", {}).get("user", {})
+    data_strings = step_strings.get("data", {})
+    
+    # Home Assistant otomatik olarak strings.json'dan label'ları alır
+    # Ama manuel olarak da ekleyebiliriz
+    return vol.Schema(
+        {
+            vol.Required("city"): str,
+            vol.Optional("district", default=""): str,
+            vol.Optional("api_url", default=DEFAULT_API_URL): str,
+            vol.Optional("update_interval", default=DEFAULT_UPDATE_INTERVAL): int,
+            vol.Optional("limit", default=0): int,
+            vol.Optional("sensor_count", default=DEFAULT_SENSOR_COUNT): vol.Coerce(int),
+        }
+    )
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
@@ -73,9 +97,28 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
+        # Home Assistant'ın translation sistemini kullan
+        try:
+            translations = await translation.async_get_translations(
+                self.hass, self.hass.config.language, "config", [DOMAIN]
+            )
+        except Exception:
+            translations = {}
+        
+        # Fallback olarak strings.json'dan yükle
+        strings = _load_strings()
+        step_strings = strings.get("config", {}).get("step", {}).get("user", {})
+        error_strings = strings.get("config", {}).get("error", {})
+        
+        # Translation'dan veya strings.json'dan al
+        title = translations.get(f"config.step.user.title", step_strings.get("title", "Nöbetçi Eczane Yapılandırması"))
+        description = translations.get(f"config.step.user.description", step_strings.get("description", ""))
+        
         if user_input is None:
             return self.async_show_form(
-                step_id="user", data_schema=STEP_USER_DATA_SCHEMA
+                step_id="user",
+                data_schema=_get_schema(strings),
+                description_placeholders={"title": title, "description": description},
             )
         
         errors = {}
@@ -83,18 +126,24 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         try:
             info = await validate_input(self.hass, user_input)
         except CannotConnect:
-            errors["base"] = "cannot_connect"
+            error_msg = translations.get(f"config.error.cannot_connect", error_strings.get("cannot_connect", "cannot_connect"))
+            errors["base"] = error_msg
         except ValueError as e:
-            errors["base"] = "invalid_sensor_count"
+            error_msg = translations.get(f"config.error.invalid_sensor_count", error_strings.get("invalid_sensor_count", "invalid_sensor_count"))
+            errors["base"] = error_msg
             _LOGGER.error(f"Geçersiz sensor sayısı: {e}")
         except Exception:
             _LOGGER.exception("Unexpected exception")
-            errors["base"] = "unknown"
+            error_msg = translations.get(f"config.error.unknown", error_strings.get("unknown", "unknown"))
+            errors["base"] = error_msg
         else:
             return self.async_create_entry(title=info["title"], data=user_input)
         
         return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+            step_id="user",
+            data_schema=_get_schema(strings),
+            errors=errors,
+            description_placeholders={"title": title, "description": description},
         )
 
 
