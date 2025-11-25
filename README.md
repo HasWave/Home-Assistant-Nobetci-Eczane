@@ -112,19 +112,19 @@ cards:
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-template-card
-        primary: "{{ states('sensor.haswave_nobetci_eczane_1') }}"
-        secondary: |-
-          📞 {{ state_attr('sensor.haswave_nobetci_eczane_1', 'phone') }}
+        primary: "{{ states('sensor.nobetci_eczane_1') }}"
+        secondary: 📞 {{ state_attr('sensor.nobetci_eczane_1', 'phone') }}
         icon: mdi:stethoscope
-        icon_color: red
-        entity: sensor.haswave_nobetci_eczane_1
+        entity: sensor.nobetci_eczane_1
+        color: red
+        features_position: bottom
       - type: custom:mushroom-template-card
-        primary: "{{ states('sensor.haswave_nobetci_eczane_2') }}"
-        secondary: |-
-          📞 {{ state_attr('sensor.haswave_nobetci_eczane_2', 'phone') }}
+        primary: "{{ states('sensor.nobetci_eczane_1') }}"
+        secondary: 📞 {{ state_attr('sensor.nobetci_eczane_1', 'phone') }}
         icon: mdi:stethoscope
         icon_color: red
-        entity: sensor.haswave_nobetci_eczane_2
+        entity: sensor.nobetci_eczane_1
+
 ```
 
 **Not:** Mushroom Cards kullanmak için [Mushroom Cards](https://github.com/piitaya/lovelace-mushroom) eklentisini yüklemeniz gerekir.
@@ -229,3 +229,4 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 ⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
 
 Made with ❤️ by HasWave
+
