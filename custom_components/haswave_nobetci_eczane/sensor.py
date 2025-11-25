@@ -46,7 +46,7 @@ async def async_setup_entry(
     coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     sensor_count = hass.data[DOMAIN][entry.entry_id].get("sensor_count", 5)
     
-    entities = [HasWaveEczaneCountSensor(coordinator)]
+    entities = []
     
     # Her eczane için ayrı sensor oluştur (kullanıcı tarafından belirlenen sayı kadar)
     # Tüm sensor'ları baştan oluştur, data geldiğinde güncellenecek
@@ -54,23 +54,6 @@ async def async_setup_entry(
         entities.append(HasWaveEczaneSensor(coordinator, i))
     
     async_add_entities(entities)
-
-
-class HasWaveEczaneCountSensor(CoordinatorEntity, SensorEntity):
-    """Representation of pharmacy count sensor."""
-    
-    def __init__(self, coordinator: DataUpdateCoordinator) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}_count"
-        self._attr_name = "Nöbetçi Eczane Sayısı"
-        self._attr_icon = "mdi:pharmacy"
-        self._attr_state_class = SensorStateClass.MEASUREMENT
-    
-    @property
-    def native_value(self) -> int:
-        """Return the state of the sensor."""
-        return len(self.coordinator.data or [])
 
 
 class HasWaveEczaneSensor(CoordinatorEntity, SensorEntity):
@@ -85,31 +68,55 @@ class HasWaveEczaneSensor(CoordinatorEntity, SensorEntity):
         self._attr_icon = "mdi:stethoscope"
     
     @property
-    def native_value(self) -> str:
+    def native_value(self) -> str | None:
         """Return the state of the sensor."""
         if self.coordinator.data is None:
             _LOGGER.debug(f"Eczane sensor {self._index}: Coordinator data is None")
-            return "N/A"
+            return None
         
         pharmacies = self.coordinator.data
         _LOGGER.debug(f"Eczane sensor {self._index}: {len(pharmacies)} eczane bulundu")
         
-        if self._index <= len(pharmacies):
-            name = pharmacies[self._index - 1].get("name", "N/A")
-            _LOGGER.debug(f"Eczane sensor {self._index}: {name}")
-            return name
-        return "N/A"
+        # Veri yoksa None döndür (sensor unavailable olur)
+        if self._index > len(pharmacies):
+            return None
+        
+        name = pharmacies[self._index - 1].get("name")
+        if not name:
+            return None
+        
+        _LOGGER.debug(f"Eczane sensor {self._index}: {name}")
+        return name
     
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional state attributes."""
-        pharmacies = self.coordinator.data or []
-        if self._index <= len(pharmacies):
-            pharmacy = pharmacies[self._index - 1]
-            return {
-                "phone": format_phone_number(pharmacy.get("phone", "")),
-                "address": pharmacy.get("address", ""),
-                "map_link": pharmacy.get("map_link", ""),
-            }
-        return {}
+        if self.coordinator.data is None:
+            return {}
+        
+        pharmacies = self.coordinator.data
+        
+        # Veri yoksa boş attributes döndür
+        if self._index > len(pharmacies):
+            return {}
+        
+        pharmacy = pharmacies[self._index - 1]
+        if not pharmacy:
+            return {}
+        
+        attributes = {}
+        
+        phone = pharmacy.get("phone")
+        if phone:
+            attributes["phone"] = format_phone_number(phone)
+        
+        address = pharmacy.get("address")
+        if address:
+            attributes["address"] = address
+        
+        map_link = pharmacy.get("map_link")
+        if map_link:
+            attributes["map_link"] = map_link
+        
+        return attributes
 
