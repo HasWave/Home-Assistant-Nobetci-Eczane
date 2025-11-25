@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
-from .const import DOMAIN, DEFAULT_API_URL, DEFAULT_UPDATE_INTERVAL
+from .const import DOMAIN, DEFAULT_API_URL, DEFAULT_UPDATE_INTERVAL, DEFAULT_SENSOR_COUNT
 from .api import HasWaveEczaneAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,6 +23,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Optional("api_url", default=DEFAULT_API_URL): str,
         vol.Optional("update_interval", default=DEFAULT_UPDATE_INTERVAL): int,
         vol.Optional("limit", default=0): int,
+        vol.Optional("sensor_count", default=DEFAULT_SENSOR_COUNT): vol.All(vol.Coerce(int), vol.Range(min=1, max=10)),
     }
 )
 
