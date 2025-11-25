@@ -29,11 +29,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     update_interval = entry.data.get("update_interval", DEFAULT_UPDATE_INTERVAL)
     
+    async def async_update_data():
+        """Fetch data from API."""
+        return await hass.async_add_executor_job(api.fetch_pharmacies)
+    
     coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
         name=DOMAIN,
-        update_method=api.fetch_pharmacies,
+        update_method=async_update_data,
         update_interval=timedelta(seconds=update_interval),
     )
     
