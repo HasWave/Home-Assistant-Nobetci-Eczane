@@ -7,7 +7,7 @@
         "data": {
           "city": "İl",
           "district": "İlçe",
-          "api_url": "API URL",
+          "api_url": "API Adresi",
           "update_interval": "Güncelleme Aralığı (saniye)",
           "limit": "Maksimum Eczane Sayısı",
           "sensor_count": "Sensor Sayısı"
