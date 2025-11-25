@@ -68,9 +68,6 @@
 
 Integration otomatik olarak şu sensor'ları oluşturur:
 
-#### `sensor.haswave_nobetci_eczane_count`
-Nöbetçi eczane sayısı (statistics için)
-
 #### `sensor.haswave_nobetci_eczane_1`
 1. eczane adı (attributes içinde telefon, adres, harita linki)
 
@@ -94,12 +91,9 @@ Lovelace UI'da kart ekleyin:
 type: entities
 title: Nöbetçi Eczaneler
 entities:
-  - entity: sensor.haswave_nobetci_eczane_count
-    name: Nöbetçi Eczane Sayısı
-    icon: mdi:stethoscope
   - entity: sensor.haswave_nobetci_eczane_1
     name: En Yakın Eczane
-    icon: mdi:stethoscope
+    icon: mdi:pharmacy
 ```
 
 #### Mushroom Template Card Örneği (Önerilen)
@@ -112,19 +106,19 @@ cards:
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-template-card
-        primary: "{{ states('sensor.nobetci_eczane_1') }}"
-        secondary: 📞 {{ state_attr('sensor.nobetci_eczane_1', 'phone') }}
-        icon: mdi:stethoscope
-        entity: sensor.nobetci_eczane_1
-        color: red
-        features_position: bottom
-      - type: custom:mushroom-template-card
-        primary: "{{ states('sensor.nobetci_eczane_1') }}"
-        secondary: 📞 {{ state_attr('sensor.nobetci_eczane_1', 'phone') }}
+        primary: "{{ states('sensor.haswave_nobetci_eczane_1') }}"
+        secondary: |-
+          📞 {{ state_attr('sensor.haswave_nobetci_eczane_1', 'phone') }}
         icon: mdi:stethoscope
         icon_color: red
-        entity: sensor.nobetci_eczane_1
-
+        entity: sensor.haswave_nobetci_eczane_1
+      - type: custom:mushroom-template-card
+        primary: "{{ states('sensor.haswave_nobetci_eczane_2') }}"
+        secondary: |-
+          📞 {{ state_attr('sensor.haswave_nobetci_eczane_2', 'phone') }}
+        icon: mdi:stethoscope
+        icon_color: red
+        entity: sensor.haswave_nobetci_eczane_2
 ```
 
 **Not:** Mushroom Cards kullanmak için [Mushroom Cards](https://github.com/piitaya/lovelace-mushroom) eklentisini yüklemeniz gerekir.
@@ -229,4 +223,3 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 ⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
 
 Made with ❤️ by HasWave
-
