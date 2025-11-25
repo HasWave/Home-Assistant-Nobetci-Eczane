@@ -1,6 +1,7 @@
 """Sensor platform for HasWave Nöbetçi Eczane."""
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription, SensorStateClass
@@ -10,6 +11,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
 from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def format_phone_number(phone: str) -> str:
@@ -45,9 +48,9 @@ async def async_setup_entry(
     entities = [HasWaveEczaneCountSensor(coordinator)]
     
     # Her eczane için ayrı sensor oluştur (maksimum 10)
-    pharmacies = coordinator.data or []
-    for i, pharmacy in enumerate(pharmacies[:10]):
-        entities.append(HasWaveEczaneSensor(coordinator, i + 1))
+    # Tüm sensor'ları baştan oluştur, data geldiğinde güncellenecek
+    for i in range(1, 11):  # 1'den 10'a kadar
+        entities.append(HasWaveEczaneSensor(coordinator, i))
     
     async_add_entities(entities)
 
@@ -83,9 +86,17 @@ class HasWaveEczaneSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> str:
         """Return the state of the sensor."""
-        pharmacies = self.coordinator.data or []
+        if self.coordinator.data is None:
+            _LOGGER.debug(f"Eczane sensor {self._index}: Coordinator data is None")
+            return "N/A"
+        
+        pharmacies = self.coordinator.data
+        _LOGGER.debug(f"Eczane sensor {self._index}: {len(pharmacies)} eczane bulundu")
+        
         if self._index <= len(pharmacies):
-            return pharmacies[self._index - 1].get("name", "N/A")
+            name = pharmacies[self._index - 1].get("name", "N/A")
+            _LOGGER.debug(f"Eczane sensor {self._index}: {name}")
+            return name
         return "N/A"
     
     @property
