@@ -35,12 +35,17 @@ class HasWaveEczaneAPI:
             
             if response.status_code == 200:
                 data = response.json()
+                _LOGGER.debug(f"API yanıtı: {type(data)}, Keys: {list(data.keys()) if isinstance(data, dict) else 'N/A'}")
+                
                 if isinstance(data, dict):
-                    return data.get("data") or data.get("eczaneler", [])
+                    pharmacies = data.get("data") or data.get("eczaneler", [])
+                    _LOGGER.info(f"API'den {len(pharmacies)} eczane verisi alındı")
+                    return pharmacies
                 elif isinstance(data, list):
+                    _LOGGER.info(f"API'den {len(data)} eczane verisi alındı (liste formatında)")
                     return data
             else:
-                _LOGGER.error(f"HTTP hatası: {response.status_code}")
+                _LOGGER.error(f"HTTP hatası: {response.status_code} - {response.text}")
                 
         except Exception as e:
             _LOGGER.error(f"API bağlantı hatası: {e}")
