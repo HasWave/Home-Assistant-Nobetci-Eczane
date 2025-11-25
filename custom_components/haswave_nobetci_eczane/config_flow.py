@@ -23,13 +23,24 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Optional("api_url", default=DEFAULT_API_URL): str,
         vol.Optional("update_interval", default=DEFAULT_UPDATE_INTERVAL): int,
         vol.Optional("limit", default=0): int,
-        vol.Optional("sensor_count", default=DEFAULT_SENSOR_COUNT): vol.All(vol.Coerce(int), vol.Range(min=1, max=10)),
+        vol.Optional("sensor_count", default=DEFAULT_SENSOR_COUNT): vol.Coerce(int),
     }
 )
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect."""
+    # Sensor count kontrolü
+    sensor_count = data.get("sensor_count", DEFAULT_SENSOR_COUNT)
+    if isinstance(sensor_count, str):
+        try:
+            sensor_count = int(sensor_count)
+        except (ValueError, TypeError):
+            sensor_count = DEFAULT_SENSOR_COUNT
+    
+    if sensor_count < 1 or sensor_count > 10:
+        raise ValueError("Sensor sayısı 1-10 arası olmalıdır")
+    
     api = HasWaveEczaneAPI(
         api_url=data.get("api_url", DEFAULT_API_URL),
         city=data["city"],
@@ -39,8 +50,16 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     
     result = await hass.async_add_executor_job(api.fetch_pharmacies)
     
+    # None dönerse hata var demektir
     if result is None:
         raise CannotConnect
+    
+    # Boş liste de geçerli bir sonuçtur (sadece il ile de çalışabilir, eczane olmayabilir)
+    if isinstance(result, list):
+        if len(result) == 0:
+            _LOGGER.info(f"API'den eczane verisi dönmedi (boş liste). İl: {data['city']}, İlçe: {data.get('district', 'Yok')}. Bu normal olabilir.")
+        else:
+            _LOGGER.info(f"API bağlantısı başarılı: {len(result)} eczane bulundu")
     
     return {"title": f"Nöbetçi Eczane - {data['city']}"}
 
@@ -65,6 +84,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             info = await validate_input(self.hass, user_input)
         except CannotConnect:
             errors["base"] = "cannot_connect"
+        except ValueError as e:
+            errors["base"] = "invalid_sensor_count"
+            _LOGGER.error(f"Geçersiz sensor sayısı: {e}")
         except Exception:
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
