@@ -12,7 +12,6 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import translation
 
 from .const import DOMAIN, DEFAULT_API_URL, DEFAULT_UPDATE_INTERVAL, DEFAULT_SENSOR_COUNT
 from .api import HasWaveEczaneAPI
@@ -97,28 +96,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
-        # Home Assistant'ın translation sistemini kullan
-        try:
-            translations = await translation.async_get_translations(
-                self.hass, self.hass.config.language, "config", [DOMAIN]
-            )
-        except Exception:
-            translations = {}
-        
-        # Fallback olarak strings.json'dan yükle
         strings = _load_strings()
         step_strings = strings.get("config", {}).get("step", {}).get("user", {})
         error_strings = strings.get("config", {}).get("error", {})
-        
-        # Translation'dan veya strings.json'dan al
-        title = translations.get(f"config.step.user.title", step_strings.get("title", "Nöbetçi Eczane Yapılandırması"))
-        description = translations.get(f"config.step.user.description", step_strings.get("description", ""))
         
         if user_input is None:
             return self.async_show_form(
                 step_id="user",
                 data_schema=_get_schema(strings),
-                description_placeholders={"title": title, "description": description},
             )
         
         errors = {}
@@ -126,16 +111,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         try:
             info = await validate_input(self.hass, user_input)
         except CannotConnect:
-            error_msg = translations.get(f"config.error.cannot_connect", error_strings.get("cannot_connect", "cannot_connect"))
-            errors["base"] = error_msg
+            errors["base"] = error_strings.get("cannot_connect", "cannot_connect")
         except ValueError as e:
-            error_msg = translations.get(f"config.error.invalid_sensor_count", error_strings.get("invalid_sensor_count", "invalid_sensor_count"))
-            errors["base"] = error_msg
+            errors["base"] = error_strings.get("invalid_sensor_count", "invalid_sensor_count")
             _LOGGER.error(f"Geçersiz sensor sayısı: {e}")
         except Exception:
             _LOGGER.exception("Unexpected exception")
-            error_msg = translations.get(f"config.error.unknown", error_strings.get("unknown", "unknown"))
-            errors["base"] = error_msg
+            errors["base"] = error_strings.get("unknown", "unknown")
         else:
             return self.async_create_entry(title=info["title"], data=user_input)
         
@@ -143,7 +125,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=_get_schema(strings),
             errors=errors,
-            description_placeholders={"title": title, "description": description},
         )
 
 
