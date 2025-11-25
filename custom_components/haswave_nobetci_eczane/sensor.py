@@ -44,12 +44,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up the sensor platform."""
     coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    sensor_count = hass.data[DOMAIN][entry.entry_id].get("sensor_count", 5)
     
     entities = [HasWaveEczaneCountSensor(coordinator)]
     
-    # Her eczane için ayrı sensor oluştur (maksimum 10)
+    # Her eczane için ayrı sensor oluştur (kullanıcı tarafından belirlenen sayı kadar)
     # Tüm sensor'ları baştan oluştur, data geldiğinde güncellenecek
-    for i in range(1, 11):  # 1'den 10'a kadar
+    for i in range(1, sensor_count + 1):
         entities.append(HasWaveEczaneSensor(coordinator, i))
     
     async_add_entities(entities)
@@ -81,7 +82,7 @@ class HasWaveEczaneSensor(CoordinatorEntity, SensorEntity):
         self._index = index
         self._attr_unique_id = f"{DOMAIN}_{index}"
         self._attr_name = f"Nöbetçi Eczane {index}"
-        self._attr_icon = "mdi:pharmacy"
+        self._attr_icon = "mdi:stethoscope"
     
     @property
     def native_value(self) -> str:
