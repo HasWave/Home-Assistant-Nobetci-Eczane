@@ -10,7 +10,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
-<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=HasWave&repository=HACS-Nobetci-Eczane&category=Integration" target="_blank">
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=HasWave&repository=Home-Assistant-Nobetci-Eczane&category=Integration" target="_blank">
   <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.">
 </a>
 
@@ -34,7 +34,7 @@
 
 1. Home Assistant → **HACS** → **Integrations**
 2. Sağ üstteki **⋮** menüsünden **Custom repositories** seçin
-3. Repository URL: `https://github.com/HasWave/HACS-Nobetci-Eczane`
+3. Repository URL: `https://github.com/HasWave/Home-Assistant-Nobetci-Eczane`
 4. Category: **Integration** seçin
 5. **Add** butonuna tıklayın
 6. HACS → Integrations → **HasWave Nöbetçi Eczane**'yi bulun
@@ -223,3 +223,4 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 ⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
 
 Made with ❤️ by HasWave
+
