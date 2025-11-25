@@ -31,6 +31,7 @@ class HasWaveEczaneAPI:
             if self.limit > 0:
                 params["limit"] = self.limit
             
+            _LOGGER.debug(f"API isteği: {self.api_url} - Params: {params}")
             response = requests.get(self.api_url, params=params, timeout=15)
             
             if response.status_code == 200:
@@ -39,16 +40,24 @@ class HasWaveEczaneAPI:
                 
                 if isinstance(data, dict):
                     pharmacies = data.get("data") or data.get("eczaneler", [])
-                    _LOGGER.info(f"API'den {len(pharmacies)} eczane verisi alındı")
+                    if pharmacies:
+                        _LOGGER.info(f"API'den {len(pharmacies)} eczane verisi alındı (İl: {self.city}, İlçe: {self.district or 'Yok'})")
+                    else:
+                        _LOGGER.warning(f"API'den boş liste döndü (İl: {self.city}, İlçe: {self.district or 'Yok'})")
                     return pharmacies
                 elif isinstance(data, list):
-                    _LOGGER.info(f"API'den {len(data)} eczane verisi alındı (liste formatında)")
+                    if data:
+                        _LOGGER.info(f"API'den {len(data)} eczane verisi alındı (liste formatında, İl: {self.city}, İlçe: {self.district or 'Yok'})")
+                    else:
+                        _LOGGER.warning(f"API'den boş liste döndü (liste formatında, İl: {self.city}, İlçe: {self.district or 'Yok'})")
                     return data
             else:
                 _LOGGER.error(f"HTTP hatası: {response.status_code} - {response.text}")
+                return None
                 
         except Exception as e:
-            _LOGGER.error(f"API bağlantı hatası: {e}")
+            _LOGGER.error(f"API bağlantı hatası: {e}", exc_info=True)
+            return None
         
-        return []
+        return None
 
