@@ -1,6 +1,7 @@
 {
   "name": "HasWave Nöbetçi Eczane",
-  "country": ["TR"],
+  "country": "TR",
   "render_readme": true
 }
+
 
