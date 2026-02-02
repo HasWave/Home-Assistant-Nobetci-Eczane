@@ -8,8 +8,6 @@
 
 **İl ve ilçe bazlı nöbetçi eczane bilgilerini Home Assistant sensor olarak ekler**
 
-**api.haswave.com kullanılmaz** — Veri doğrudan **eczaneleri.net**'ten alınır (PHP eczane.php ile aynı mantık).
-
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=HasWave&repository=Home-Assistant-Nobetci-Eczane&category=Integration" target="_blank">
