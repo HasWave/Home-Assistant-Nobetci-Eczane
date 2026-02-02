@@ -2,20 +2,29 @@
   "config": {
     "step": {
       "user": {
-        "title": "Nöbetçi Eczane (iframe)",
-        "description": "İl ve ilçe seçin. Eczane listesi iframe ile gösterilir (API kullanılmaz).",
+        "title": "Nöbetçi Eczane",
+        "description": "İl ve ilçe girin. Veri doğrudan eczaneleri.net'ten alınır (api.haswave.com kullanılmaz).",
         "data": {
           "city": "İl",
-          "district": "İlçe"
+          "district": "İlçe",
+          "update_interval": "Güncelleme aralığı (saniye)",
+          "limit": "Maksimum eczane sayısı (0 = tümü)",
+          "sensor_count": "Sensor sayısı (1–10)"
         },
         "data_description": {
-          "city": "Büyük harf ile il adı (örn: TEKİRDAĞ, İSTANBUL, ANKARA)",
-          "district": "Büyük harf ile ilçe adı (opsiyonel, örn: ÇERKEZKÖY, KADIKÖY)"
+          "city": "Büyük harf ile il (örn: TEKİRDAĞ, İSTANBUL)",
+          "district": "Büyük harf ile ilçe (opsiyonel)",
+          "update_interval": "Saniye (varsayılan: 3600 = 1 saat)",
+          "limit": "0 = tümü",
+          "sensor_count": "Oluşturulacak eczane sensor sayısı"
         }
       }
     },
     "error": {
-      "city_required": "İl alanı zorunludur."
+      "city_required": "İl alanı zorunludur.",
+      "cannot_connect": "Eczaneleri.net'e bağlanılamadı. İl/ilçe veya interneti kontrol edin.",
+      "invalid_sensor_count": "Sensor sayısı 1–10 arası olmalıdır.",
+      "unknown": "Beklenmeyen bir hata oluştu."
     }
   }
 }
