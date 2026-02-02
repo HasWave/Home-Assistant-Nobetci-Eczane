@@ -22,9 +22,10 @@
     },
     "error": {
       "city_required": "İl alanı zorunludur.",
-      "cannot_connect": "Eczaneleri.net'e bağlanılamadı. İl/ilçe veya interneti kontrol edin.",
+      "cannot_connect": "Bağlantı Kurulamadı. İl/ilçe veya interneti kontrol edin.",
       "invalid_sensor_count": "Sensor sayısı 1–10 arası olmalıdır.",
       "unknown": "Beklenmeyen bir hata oluştu."
     }
   }
 }
+
