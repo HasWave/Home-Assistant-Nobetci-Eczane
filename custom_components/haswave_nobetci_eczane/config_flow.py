@@ -1,4 +1,3 @@
-"""Config flow for HasWave Nöbetçi Eczane (iframe, API yok)."""
 from __future__ import annotations
 
 import json
