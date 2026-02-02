@@ -2,11 +2,13 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2023.6%2B-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-**İl ve ilçe bazlı nöbetçi eczane bilgilerini iframe panel olarak gösterir (API kullanılmaz)**
+**İl ve ilçe bazlı nöbetçi eczane bilgilerini Home Assistant sensor olarak ekler**
+
+**api.haswave.com kullanılmaz** — Veri doğrudan **eczaneleri.net**'ten alınır (PHP eczane.php ile aynı mantık).
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
@@ -20,10 +22,10 @@
 
 ## 📋 Özellikler
 
-* 💊 **Nöbetçi Eczaneler** — İl ve ilçe bazlı güncel liste (iframe ile)
-* ✅ **API yok** — Veri doğrudan iframe içinde gösterilir, ek API çağrısı yapılmaz
-* 🖥️ **Panel** — Home Assistant sidebar'da "Nöbetçi Eczane" paneli
-* 📍 **Kolay kurulum** — Sadece il ve ilçe girin
+* 💊 **Nöbetçi Eczaneler** — İl ve ilçe bazlı güncel liste
+* ✅ **api.haswave.com yok** — Veri doğrudan eczaneleri.net'ten HTML parse edilir (PHP API ile aynı kaynak)
+* 📍 **Sensor'lar** — Eczane adı, telefon, adres, harita linki (attributes)
+* 🔄 **Otomatik güncelleme** — Güncelleme aralığı ayarlanabilir (varsayılan 1 saat)
 
 ## 🚀 Hızlı Başlangıç
 
@@ -33,68 +35,45 @@
 2. Sağ üstteki **⋮** menüsünden **Custom repositories** seçin
 3. Repository URL: `https://github.com/HasWave/Home-Assistant-Nobetci-Eczane`
 4. Category: **Integration** seçin
-5. **Add** butonuna tıklayın
-6. HACS → Integrations → **HasWave Nöbetçi Eczane**'yi bulun (ikon ve logo görünür)
-7. **Download** butonuna tıklayın
-8. Home Assistant'ı yeniden başlatın
+5. **Add** → HACS'ta **HasWave Nöbetçi Eczane**'yi bulun → **Download**
+6. Home Assistant'ı yeniden başlatın
 
-### 2️⃣ Manuel Kurulum
+### 2️⃣ Integration Ekleme
 
-1. Bu repository'yi klonlayın veya indirin
-2. `custom_components/haswave_nobetci_eczane` klasörünü Home Assistant'ın `config/custom_components/` klasörüne kopyalayın
-3. `brand` klasörünü (icon.png, logo.png) repository kökünde bırakın — HACS ikon ve logo için kullanır
-4. Home Assistant'ı yeniden başlatın
+1. **Settings** → **Devices & Services** → **+ ADD INTEGRATION**
+2. **HasWave Nöbetçi Eczane** arayın ve seçin
+3. **İl** (örn: TEKİRDAĞ, İSTANBUL), **İlçe** (opsiyonel), güncelleme aralığı, sensor sayısı girin
+4. **Submit**
 
-### 3️⃣ Integration Ekleme
-
-1. Home Assistant → **Settings** → **Devices & Services**
-2. Sağ alttaki **+ ADD INTEGRATION** butonuna tıklayın
-3. **HasWave Nöbetçi Eczane** arayın ve seçin (ikon ve logo görünür)
-4. Yapılandırma formunu doldurun:
-   - **İl**: Büyük harf ile il adı (örn: `TEKİRDAĞ`, `İSTANBUL`, `ANKARA`)
-   - **İlçe**: Büyük harf ile ilçe adı (opsiyonel, örn: `ÇERKEZKÖY`, `KADIKÖY`)
-5. **Submit** butonuna tıklayın
-
-**✅ Panel otomatik eklenir:** Sidebar'da **Nöbetçi Eczane** paneli görünür; tıklayınca il/ilçe seçtiğiniz eczane listesi iframe ile açılır.
+**Sensor'lar otomatik oluşturulur:** `sensor.haswave_nobetci_eczane_1`, `_2`, … (attributes: phone, address, map_link).
 
 ## 📖 Kullanım
 
-- **Panel:** Sol menüde **Nöbetçi Eczane**'ye tıklayın. İl ve ilçe seçiminize göre eczane listesi (eczaneleri.net iframe) gösterilir.
-- **API kullanılmaz** — Tüm veri iframe içinde yüklendiği için ek sunucu/API gerekmez.
+- **Sensor'lar:** `sensor.haswave_nobetci_eczane_1` vb. — state = eczane adı; attributes: `phone`, `address`, `map_link`.
+- **Dashboard:** Entities kartı veya Mushroom kart ile kullanabilirsiniz.
 
 ## 📁 Dosya Yapısı
 
 ```
-Home-Assistant-Nobetci-Eczane/
-├── brand/
-│   ├── icon.png   # HACS / HA entegrasyon listesi ikonu
-│   └── logo.png   # HACS detay sayfası logosu
-├── custom_components/
-│   └── haswave_nobetci_eczane/
-│       ├── __init__.py
-│       ├── manifest.json
-│       ├── const.py
-│       ├── config_flow.py
-│       ├── strings.json
-│       └── api.py  # (boş, geriye dönük uyumluluk)
-├── hacs.json
-└── README.md
+custom_components/haswave_nobetci_eczane/
+├── __init__.py
+├── manifest.json
+├── const.py
+├── api.py          # eczaneleri.net HTML fetch + parse (api.haswave.com yok)
+├── config_flow.py
+├── sensor.py
+└── strings.json
 ```
 
 ## 🔧 Sorun Giderme
 
-* **Panel görünmüyor:** Integration'ı ekledikten sonra Home Assistant'ı yeniden başlatın.
-* **Iframe boş:** İnternet bağlantınızı kontrol edin; iframe `https://api.haswave.com/eczane-iframe.php` ve eczaneleri.net erişilebilir olmalı.
-* **İkon/logo HACS'ta görünmüyor:** Repository'de `brand/icon.png` ve `brand/logo.png` olduğundan emin olun.
+* **Veri gelmiyor:** İl/ilçe büyük harf (TEKİRDAĞ, ÇERKEZKÖY). İnternet erişimi ve eczaneleri.net erişilebilir olmalı.
+* **api.haswave.com:** Bu eklenti api.haswave.com sitesini **kullanmaz**; veri doğrudan eczaneleri.net'ten alınır.
 
 ## 📝 Lisans
 
-Bu proje MIT lisansı altında lisanslanmıştır.
+MIT
 
 ## 👨‍🔧 Geliştirici
 
-**HasWave** — 🌐 [haswave.com](https://haswave.com) | 📦 [GitHub](https://github.com/HasWave)
-
----
-
-⭐ Beğendiyseniz yıldız vermeyi unutmayın!
+**HasWave** — [haswave.com](https://haswave.com) | [GitHub](https://github.com/HasWave)
