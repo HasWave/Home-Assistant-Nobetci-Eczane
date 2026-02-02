@@ -64,7 +64,7 @@ custom_components/haswave_nobetci_eczane/
 
 ## 🔧 Sorun Giderme
 
-* **Veri gelmiyor:** İl/ilçe büyük harf (TEKİRDAĞ, ÇERKEZKÖY). İnternet erişimi ve eczaneleri.net erişilebilir olmalı.
+* **Veri gelmiyor:** İl/ilçe büyük harf (TEKİRDAĞ, ÇERKEZKÖY).
 
 ## 📝 Lisans
 
