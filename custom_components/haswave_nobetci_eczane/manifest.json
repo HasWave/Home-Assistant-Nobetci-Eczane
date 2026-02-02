@@ -1,0 +1,10 @@
+{
+  "domain": "haswave_nobetci_eczane",
+  "name": "HasWave Nöbetçi Eczane",
+  "documentation": "https://github.com/HasWave/Home-Assistant-Nobetci-Eczane",
+  "requirements": [],
+  "version": "2.0.0",
+  "iot_class": "local_polling",
+  "codeowners": ["@HasWave"],
+  "config_flow": true
+}

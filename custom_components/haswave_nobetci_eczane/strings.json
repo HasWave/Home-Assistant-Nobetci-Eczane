@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nöbetçi Eczane (iframe)",
+        "description": "İl ve ilçe seçin. Eczane listesi iframe ile gösterilir (API kullanılmaz).",
+        "data": {
+          "city": "İl",
+          "district": "İlçe"
+        },
+        "data_description": {
+          "city": "Büyük harf ile il adı (örn: TEKİRDAĞ, İSTANBUL, ANKARA)",
+          "district": "Büyük harf ile ilçe adı (opsiyonel, örn: ÇERKEZKÖY, KADIKÖY)"
+        }
+      }
+    },
+    "error": {
+      "city_required": "İl alanı zorunludur."
+    }
+  }
+}
