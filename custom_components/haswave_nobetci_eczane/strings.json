@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Nöbetçi Eczane",
-        "description": "İl ve ilçe girin. Veri doğrudan eczaneleri.net'ten alınır (api.haswave.com kullanılmaz).",
+        "description": "İl ve İlçe girin. Veri doğrudan eczaneleri.net'ten alınır.",
         "data": {
           "city": "İl",
           "district": "İlçe",
