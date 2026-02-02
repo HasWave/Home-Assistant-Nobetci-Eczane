@@ -1,57 +1,66 @@
-"""HasWave Nöbetçi Eczane — iframe panel (API kullanılmaz)."""
 from __future__ import annotations
 
 import logging
-from urllib.parse import urlencode
+from datetime import timedelta
 
-from homeassistant.components import frontend
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DOMAIN, DEFAULT_IFRAME_BASE
+from .const import DOMAIN, DEFAULT_UPDATE_INTERVAL
+from .api import fetch_pharmacies
 
 _LOGGER = logging.getLogger(__name__)
 
-
-def _panel_key(entry_id: str) -> str:
-    """Her entry için benzersiz panel anahtarı."""
-    return f"haswave_nobetci_eczane_{entry_id}"
+PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up HasWave Nöbetçi Eczane from a config entry — iframe panel."""
+    """Set up HasWave Nöbetçi Eczane from a config entry."""
     city = (entry.data.get("city") or "").strip()
     district = (entry.data.get("district") or "").strip()
     if not city:
-        _LOGGER.warning("İl bilgisi eksik, varsayılan kullanılıyor")
         city = "TEKİRDAĞ"
     if not district:
         district = city
+    limit = entry.data.get("limit", 0) or 0
+    update_interval = entry.data.get("update_interval", DEFAULT_UPDATE_INTERVAL) or DEFAULT_UPDATE_INTERVAL
 
-    params = {"il": city, "ilce": district}
-    iframe_url = f"{DEFAULT_IFRAME_BASE}?{urlencode(params)}"
+    async def async_update_data():
+        """Eczaneleri.net'ten veri çek."""
+        return await hass.async_add_executor_job(
+            fetch_pharmacies,
+            city,
+            district,
+            limit,
+        )
 
-    panel_key = _panel_key(entry.entry_id)
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {"iframe_url": iframe_url, "panel_key": panel_key}
-
-    # Panel kaydet — sidebar'da "Nöbetçi Eczane" görünür
-    await frontend.async_register_built_in_panel(
+    coordinator = DataUpdateCoordinator(
         hass,
-        "iframe",
-        "Nöbetçi Eczane",
-        "mdi:pharmacy",
-        panel_key,
-        {"url": iframe_url},
+        _LOGGER,
+        name=DOMAIN,
+        update_method=async_update_data,
+        update_interval=timedelta(seconds=update_interval),
     )
 
-    _LOGGER.info("Nöbetçi Eczane paneli eklendi: %s / %s", city, district)
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception as err:
+        _LOGGER.warning("İlk veri yükleme hatası (devam ediliyor): %s", err)
+
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+        "coordinator": coordinator,
+        "sensor_count": entry.data.get("sensor_count", 5),
+    }
+
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload a config entry — panel kaldır."""
-    data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
-    if data and "panel_key" in data:
-        frontend.async_remove_panel(hass, data["panel_key"])
-    hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
-    return True
+    """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+    return unload_ok
