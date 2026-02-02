@@ -21,7 +21,6 @@
 ## 📋 Özellikler
 
 * 💊 **Nöbetçi Eczaneler** — İl ve ilçe bazlı güncel liste
-* ✅ **api.haswave.com yok** — Veri doğrudan eczaneleri.net'ten HTML parse edilir (PHP API ile aynı kaynak)
 * 📍 **Sensor'lar** — Eczane adı, telefon, adres, harita linki (attributes)
 * 🔄 **Otomatik güncelleme** — Güncelleme aralığı ayarlanabilir (varsayılan 1 saat)
 
