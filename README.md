@@ -56,7 +56,7 @@ custom_components/haswave_nobetci_eczane/
 ├── __init__.py
 ├── manifest.json
 ├── const.py
-├── api.py          # eczaneleri.net HTML fetch + parse (api.haswave.com yok)
+├── api.py
 ├── config_flow.py
 ├── sensor.py
 └── strings.json
@@ -65,7 +65,6 @@ custom_components/haswave_nobetci_eczane/
 ## 🔧 Sorun Giderme
 
 * **Veri gelmiyor:** İl/ilçe büyük harf (TEKİRDAĞ, ÇERKEZKÖY). İnternet erişimi ve eczaneleri.net erişilebilir olmalı.
-* **api.haswave.com:** Bu eklenti api.haswave.com sitesini **kullanmaz**; veri doğrudan eczaneleri.net'ten alınır.
 
 ## 📝 Lisans
 
