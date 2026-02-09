@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nöbetçi Eczane Yapılandırması",
+        "description": "İl ve ilçe bazlı nöbetçi eczane bilgilerini almak için gerekli bilgileri girin. Veri her saat başı otomatik güncellenir.",
+        "data": {
+          "city": "İl",
+          "district": "İlçe",
+          "sensor_count": "Kaç eczane gösterilsin"
+        },
+        "data_description": {
+          "city": "Büyük harf ile il adı (örn: TEKİRDAĞ, İSTANBUL, ANKARA)",
+          "district": "Büyük harf ile ilçe adı (opsiyonel). Boş bırakılırsa tüm il için sonuç döner.",
+          "sensor_count": "Kaç adet nöbetçi eczane verisi çekilsin (1-20, varsayılan: 5). Kaynak: eczaneleri.net"
+        }
+      }
+    }
+  },
+  "error": {
+    "cannot_connect": "API'ye bağlanılamadı. Lütfen bilgilerinizi kontrol edin.",
+    "invalid_sensor_count": "Eczane sayısı 1-20 arası olmalıdır.",
+    "unknown": "Beklenmeyen bir hata oluştu."
+  },
+  "abort": {
+    "already_configured": "Bu entegrasyon zaten yapılandırılmış."
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Güncelleme sıklığı",
+        "description": "Verinin ne sıklıkla güncelleneceğini seçin.",
+        "data": {
+          "update_interval": "Güncelleme sıklığı"
+        }
+      }
+    }
+  }
+}
