@@ -73,20 +73,25 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         limit=sensor_count,
     )
     
+    # Sync fetch (eczaneleri.net iframe) - config flow executor'da çalışır
     result = await hass.async_add_executor_job(api.fetch_pharmacies)
-    
-    # None dönerse hata var demektir
+
+    # None dönerse bağlantı/parse hatası
     if result is None:
         raise CannotConnect
-    
-    # Boş liste de geçerli bir sonuçtur (sadece il ile de çalışabilir, eczane olmayabilir)
+
+    # Boş liste geçerli (il/ilçe doğru, o gün eczane çıkmamış olabilir)
     if isinstance(result, list):
         if len(result) == 0:
-            _LOGGER.info(f"API'den eczane verisi dönmedi (boş liste). İl: {data['city']}, İlçe: {data.get('district', 'Yok')}. Bu normal olabilir.")
+            _LOGGER.info(
+                "Eczaneleri.net boş liste (İl: %s, İlçe: %s). Devam ediliyor.",
+                data.get("city"),
+                data.get("district", "Yok"),
+            )
         else:
-            _LOGGER.info(f"API bağlantısı başarılı: {len(result)} eczane bulundu")
-    
-    return {"title": f"Nöbetçi Eczane - {data['city']}"}
+            _LOGGER.info("Eczaneleri.net bağlantı başarılı: %s eczane", len(result))
+
+    return {"title": f"Nöbetçi Eczane - {data.get('city', '')}"}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
