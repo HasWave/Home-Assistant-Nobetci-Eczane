@@ -7,6 +7,7 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN
@@ -19,30 +20,38 @@ PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BUTTON]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up HasWave Nöbetçi Eczane from a config entry."""
-    
-    sensor_count = entry.data.get("sensor_count", 5)
-    sensor_count = max(1, min(20, int(sensor_count)))
+    data = entry.data or {}
+    opts = entry.options or {}
+    sensor_count = data.get("sensor_count", 5)
+    try:
+        sensor_count = max(1, min(20, int(sensor_count)))
+    except (TypeError, ValueError):
+        sensor_count = 5
     api = HasWaveEczaneAPI(
-        city=entry.data["city"],
-        district=entry.data.get("district", ""),
+        city=data.get("city", ""),
+        district=data.get("district", ""),
         limit=sensor_count,
     )
-    
+
     async def async_update_data():
-        """Fetch data from API."""
+        """Eczaneleri.net iframe'den veri çek (aiohttp)."""
         try:
-            data = await hass.async_add_executor_job(api.fetch_pharmacies)
-            if data:
-                _LOGGER.debug(f"API'den {len(data)} eczane verisi alındı")
+            session = async_get_clientsession(hass)
+            result = await api.async_fetch(session)
+            if result is not None:
+                _LOGGER.debug("Eczaneleri.net: %s eczane verisi alındı", len(result))
             else:
-                _LOGGER.warning("API'den veri alınamadı")
-            return data
+                _LOGGER.warning("Eczaneleri.net veri alınamadı")
+            return result if result is not None else []
         except Exception as err:
-            _LOGGER.error(f"Veri güncelleme hatası: {err}")
-            raise
-    
-    update_interval = entry.options.get("update_interval", entry.data.get("update_interval", DEFAULT_UPDATE_INTERVAL))
-    update_interval = int(update_interval)
+            _LOGGER.error("Veri güncelleme hatası: %s", err, exc_info=True)
+            return []
+
+    update_interval = opts.get("update_interval", data.get("update_interval", DEFAULT_UPDATE_INTERVAL))
+    try:
+        update_interval = int(update_interval)
+    except (TypeError, ValueError):
+        update_interval = DEFAULT_UPDATE_INTERVAL
     coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
