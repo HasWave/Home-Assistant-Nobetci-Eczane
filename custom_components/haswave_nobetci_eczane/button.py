@@ -1,4 +1,3 @@
-"""Güncelle butonu - veriyi anında yeniler (Kontroller sekmesinde)."""
 from __future__ import annotations
 
 import logging
