@@ -36,7 +36,7 @@ Veriler [eczaneleri.net](https://eczaneleri.net) iframe kaynağından alınır.
 
 1. Home Assistant → **HACS** → **Integrations**
 2. Sağ üstteki **⋮** menüsünden **Custom repositories** seçin
-3. Repository URL: `https://github.com/HasWave/HACS-Nobetci-Eczane`
+3. Repository URL: `https://github.com/HasWave/Home-Assistant-Nobetci-Eczane`
 4. Category: **Integration** seçin
 5. **Add** butonuna tıklayın
 6. HACS → Integrations → **HasWave Nöbetçi Eczane**'yi bulun
